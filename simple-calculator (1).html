@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modern Animated Calculator</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --calculator-bg: #ffffff;
+            --primary-color: #4a90e2;
+            --secondary-color: #5f6caf;
+            --text-color: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .calculator {
+            background-color: var(--calculator-bg);
+            border-radius: 20px;
+            box-shadow: 
+                0 10px 25px rgba(0, 0, 0, 0.1),
+                0 15px 40px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            width: 300px;
+            transform: perspective(1000px);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+
+        #display {
+            width: 100%;
+            height: 80px;
+            margin-bottom: 20px;
+            padding: 15px;
+            font-size: 32px;
+            text-align: right;
+            background-color: #f1f5f9;
+            border: none;
+            border-radius: 12px;
+            color: var(--text-color);
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            background-color: #e9ecef;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            transform: scale(1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.3), 
+                transparent
+            );
+            transition: all 0.4s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .operator {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #equals {
+            background-color: var(--secondary-color);
+            color: white;
+            grid-row: span 2;
+        }
+
+        .clear {
+            background-color: #ff6b6b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="appendToDisplay('/')" class="operator">÷</button>
+            <button onclick="appendToDisplay('*')" class="operator">×</button>
+            <button onclick="deleteLastChar()">⌫</button>
+            
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('-')" class="operator">-</button>
+            
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('+')" class="operator">+</button>
+            
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button id="equals" onclick="calculate()">=</button>
+            
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        function appendToDisplay(value) {
+            // Add sound effect
+            const audio = new Audio('data:audio/wav;base64,UklGRtQBAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhkAEAAHRwoRkZGRkqKioqODg4OEJCQkJGRkZGPj4+PjIyMjIkJCQkGBgYGAwMDAwAAAAA9/f39y0tLS1WVlZWYmJiYm5ubm56enp6hISEhI6Ojo6UlJSUkJCQkIaGhoZ8fHx8dHR0dCwsLCwdHR0dDQ0NDfX19fUiIiIiMDAwMD4+Pj5JSUlJU1NTU11dXV1nZ2dnd3d3d4CAgICKioqKlJSUlJycnJyhoaGhr6+vr7q6urrGxsbG0dHR0draycHT09PTqKCg0by8vLzExMS72NjY2NbW1tbNzc3N');
+            audio.play();
+
+            // Limit input length to prevent overflow
+            if (display.value.length < 15) {
+                display.value += value;
+            }
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        function deleteLastChar() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function calculate() {
+            try {
+                const result = eval(display.value);
+                // Limit result to a reasonable number of decimal places
+                display.value = Number(result.toFixed(8)).toString();
+            } catch (error) {
+                display.value = 'Error';
+                setTimeout(() => {
+                    display.value = '';
+                }, 1000);
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            const validKeys = '0123456789.+-*/()';
+            
+            if (validKeys.includes(key)) {
+                appendToDisplay(key);
+            } else if (key === 'Backspace') {
+                deleteLastChar();
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
